@@ -12,7 +12,7 @@ app.use(cors());
 app.use(bodyParser.json());
 
 db.once("open", async () => {
-  if ((await getFilms.countDocuments().exec()) > 0) return;
+  if ((await Film.countDocuments().exec()) > 0) return;
 
   Promise.all([getFilms]).then(() => console.log("Here are your films!"));
 });
@@ -20,8 +20,7 @@ db.once("open", async () => {
 // Pagination
 
 app.get("/films", pagination(Film), async (req, res) => {
-  const getFilms = await client.db("movie").collection("films").find({});
-  res.json(getFilms);
+  res.json(res.paginatedResults)
 });
 function pagination(model) {
   return async (req, res, next) => {
@@ -91,23 +90,6 @@ app.delete("/films/:id", async (req, res) => {
   });
 });
 
-app.patch("/films/:id", async (req, res) => {
-  console.log(req.body);
 
-  const updatedFilm = await client
-    .db("movie")
-    .collection("films")
-    .updateOne({ _id: new ObjectId(req.params.id) }, { $set: req.body });
-
-  const matchingFilm = await client
-    .db("movie")
-    .collection("films")
-    .findOne({ _id: new ObjectId(req.params.id) });
-
-  res.json({
-    message: "Updated a film",
-    data: matchingFilm,
-  });
-});
 
 app.listen(apiPort, () => console.log(`Server running on port ${apiPort}`));
