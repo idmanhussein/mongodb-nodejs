@@ -4,6 +4,7 @@ const bodyParser = require("body-parser");
 const cors = require("cors");
 const app = express();
 const apiPort = 4000;
+const Film = require("./models/Film")
 
 app.use(express.json());
 app.use(bodyParser.urlencoded({ extended: true }));
@@ -18,11 +19,11 @@ db.once("open", async () => {
 
 // Pagination
 
-app.get("/films", pagination(), async (req, res) => {
+app.get("/films", pagination(Film), async (req, res) => {
   const getFilms = await client.db("movie").collection("films").find({});
   res.json(getFilms);
 });
-function pagination() {
+function pagination(model) {
   return async (req, res, next) => {
     const page = parseInt(req.query.page);
     const limit = parseInt(req.query.limit);
