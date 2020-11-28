@@ -1,9 +1,10 @@
-const dBConfig = require("../config/dBConfig.js");
-
 const mongoose = require("mongoose");
 
 mongoose
-  .connect("mongodb://127.0.0.1:27017/movie", { useNewUrlParser: true, useUnifiedTopology:true })
+  .connect("mongodb://127.0.0.1:27017/movie", {
+    useNewUrlParser: true,
+    useUnifiedTopology: true,
+  })
   .catch((e) => {
     console.error("Connection error", e.message);
   });

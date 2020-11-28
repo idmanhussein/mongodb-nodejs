@@ -1,11 +1,12 @@
 const express = require("express");
-const { MongoClient } = require("mongodb");
+const { MongoClient, ObjectId } = require("mongodb");
 const db = require("./models/index");
 const bodyParser = require("body-parser");
 const cors = require("cors");
 const app = express();
 const apiPort = 4000;
 const Film = require("./models/Film");
+const Watch = require("./models/Watch");
 
 app.use(express.json());
 app.use(bodyParser.urlencoded({ extended: true }));
@@ -15,7 +16,7 @@ app.use(bodyParser.json());
 db.once("open", async () => {
   if ((await Film.countDocuments().exec()) > 0) return;
 
-  Promise.all([getFilms]).then(() => console.log("Here are your films!"));
+  Promise.all([Film]).then(() => console.log("Here are your films!"));
 });
 
 // Pagination
@@ -57,15 +58,44 @@ function pagination(model) {
 }
 
 // Create a POST endpoint which creates a new collection called watch and inserts a film id and title into a collection
-app.post("/watch", async (req, res) => {
-  Film.createCollection().then(function (watch) {
-    // creating new collection works
-    const doc = Film.$set({ name: "Idman", age: 24 }); //inserting a new doc doesn't work, maybe I need to use the execPopulate() function...
-    res.json(doc);
-    console.log("Collection is created!");
-  });
+app.post("/watch", (req, res) => {
+  //created new collection using db.createCollection() but couldn't do it more than once, so collection already exists
+  try {
+    const addFilm = new Watch({
+      _id: "0eafaadje5fad",
+      title: "The Wizard of Oz",
+    });
+    Watch.create(addFilm, function () {
+      console.log(addFilm);
+    });
+  } catch (e) {
+    res.status(500).json({ message: e.message });
+  }
 });
 
+/* try {
+    const newFilm = {
+      film_id: "0eafaadje5fad",
+      name: "The wizard of Oz",
+    };
+    Account.create(newFilm, function (err, res) {
+      console.log("Collection created!");
+    });
+  } catch (e) {
+    res.status(500).json({ message: e.message });
+  }
+});
+/* const newFilm = Film.populate("watch")
+      .populate({
+        film_id: ObjectId("0eafaadje5fad"),
+        name: "The wizard of Oz",
+      })
+      .execPopulate();
+    watch.execPopulate().then(resolve, reject);
+    console.log(newFilm);
+  });
+});
+*/
 app.get("/films/:id", async (req, res) => {
   const matchingFilm = await client
     .db("movie")
