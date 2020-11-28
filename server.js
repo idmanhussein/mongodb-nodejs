@@ -1,10 +1,11 @@
 const express = require("express");
+const { MongoClient } = require("mongodb");
 const db = require("./models/index");
 const bodyParser = require("body-parser");
 const cors = require("cors");
 const app = express();
 const apiPort = 4000;
-const Film = require("./models/Film")
+const Film = require("./models/Film");
 
 app.use(express.json());
 app.use(bodyParser.urlencoded({ extended: true }));
@@ -20,7 +21,7 @@ db.once("open", async () => {
 // Pagination
 
 app.get("/films", pagination(Film), async (req, res) => {
-  res.json(res.paginatedResults)
+  res.json(res.paginatedResults);
 });
 function pagination(model) {
   return async (req, res, next) => {
@@ -55,15 +56,13 @@ function pagination(model) {
   };
 }
 
-app.post("/films", async (req, res) => {
-  const createdFilm = await client
-    .db("movie")
-    .collection("films")
-    .insertOne(req.body);
-
-  res.json({
-    message: "Created a new film!",
-    data: createdFilm,
+// Create a POST endpoint which creates a new collection called watch and inserts a film id and title into a collection
+app.post("/watch", async (req, res) => {
+  Film.createCollection().then(function (watch) {
+    // creating new collection works
+    const doc = Film.$set({ name: "Idman", age: 24 }); //inserting a new doc doesn't work, maybe I need to use the execPopulate() function...
+    res.json(doc);
+    console.log("Collection is created!");
   });
 });
 
@@ -89,7 +88,5 @@ app.delete("/films/:id", async (req, res) => {
     message: "Deleted a film",
   });
 });
-
-
 
 app.listen(apiPort, () => console.log(`Server running on port ${apiPort}`));
