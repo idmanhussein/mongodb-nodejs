@@ -7,6 +7,8 @@ const app = express();
 const apiPort = 4000;
 const Film = require("./models/Film");
 const Watch = require("./models/Watch");
+const { aggregate } = require("./models/Film");
+const { collection } = require("./models/index");
 
 app.use(express.json());
 app.use(bodyParser.urlencoded({ extended: true }));
@@ -24,6 +26,7 @@ db.once("open", async () => {
 app.get("/films", pagination(Film), async (req, res) => {
   res.json(res.paginatedResults);
 });
+
 function pagination(model) {
   return async (req, res, next) => {
     const page = parseInt(req.query.page);
@@ -48,7 +51,12 @@ function pagination(model) {
       };
     }
     try {
-      results.results = await model.find().limit(limit).skip(startIndex).exec();
+      results.results = await model
+        .find()
+        .sort({ title: 1 }) // sorts by title
+        .limit(limit)
+        .skip(startIndex)
+        .exec();
       res.paginatedResults = results;
       next();
     } catch (e) {
