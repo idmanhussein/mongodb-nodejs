@@ -73,29 +73,6 @@ app.post("/watch", (req, res) => {
   }
 });
 
-/* try {
-    const newFilm = {
-      film_id: "0eafaadje5fad",
-      name: "The wizard of Oz",
-    };
-    Account.create(newFilm, function (err, res) {
-      console.log("Collection created!");
-    });
-  } catch (e) {
-    res.status(500).json({ message: e.message });
-  }
-});
-/* const newFilm = Film.populate("watch")
-      .populate({
-        film_id: ObjectId("0eafaadje5fad"),
-        name: "The wizard of Oz",
-      })
-      .execPopulate();
-    watch.execPopulate().then(resolve, reject);
-    console.log(newFilm);
-  });
-});
-*/
 app.get("/films/:id", async (req, res) => {
   const matchingFilm = await client
     .db("movie")
