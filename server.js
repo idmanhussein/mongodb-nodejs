@@ -4,6 +4,7 @@ const bodyParser = require("body-parser");
 const cors = require("cors");
 const app = express();
 const apiPort = 4000;
+
 const Film = require("./models/Film");
 const Watch = require("./models/Watch");
 
@@ -62,9 +63,26 @@ function pagination(model) {
   };
 }
 
-// Add a GET endpoint that pages through a keyword search of a film title
+// TASK Add a GET endpoint that pages through a keyword search of a film title
 
-app.get("/films/title?keyword=star", (req, res) => {});
+// gets all film titles
+app.get("/films/title", async (req, res) => {
+  let findKeyword = "star";
+  await Film.find({ $text: { $search: findKeyword } })
+    .then((films) => console.log(films))
+    .catch((e) => console.error(e));
+});
+
+// gets all actors
+app.get("/films/actors", async (req, res) => {
+  console.log(req.query.keyword);
+  await Film.find({
+    actors: { $all: [req.query.keyword] },
+
+    // .then((films) => console.log(films))
+    // .catch((e) => console.error(e)),
+  });
+});
 
 // Create a POST endpoint which creates a new collection called watch and inserts a film id and title into a collection
 app.post("/watch", (req, res) => {
@@ -80,6 +98,10 @@ app.post("/watch", (req, res) => {
   } catch (e) {
     res.status(500).json({ message: e.message });
   }
+});
+
+app.get("/watch", pagination(Watch), (req, res) => {
+  res.json(pagination(Watch));
 });
 
 app.listen(apiPort, () => console.log(`Server running on port ${apiPort}`));

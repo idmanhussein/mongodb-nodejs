@@ -1,1 +1,2 @@
-GET  http://localhost:4000/films
+GET  http://localhost:4000/films/actors?keyword=will+smith
+

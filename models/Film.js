@@ -3,14 +3,14 @@ const Schema = mongoose.Schema;
 
 const FilmSchema = new Schema({
   _id: String,
-  title: String,
+  title: { type: String, index: true },
   year: Number,
   rated: String,
   runtime: Number,
   countries: Array,
   genres: Array,
   director: String,
-  actors: Array,
+  actors: { type: Array, index: true },
   plot: String,
   imdb: {
     rating: Number,
@@ -18,6 +18,7 @@ const FilmSchema = new Schema({
   },
 });
 
+FilmSchema.index({ title: "text" }, { actors: "text" });
 const Film = mongoose.model("film", FilmSchema); // movie.film
 
 module.exports = Film;
